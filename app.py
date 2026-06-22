@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 import joblib
 
-# Page configuration
+# ========== Page Configuration ==========
 st.set_page_config(
     page_title="UCS Prediction App",
     page_icon="🧱",
@@ -31,9 +31,14 @@ st.markdown("""
             background-color: #f5f0e8;
         }
         
+        /* All text color fix */
+        .stApp, .stMarkdown, .stText, .stNumberInput label, .stSelectbox label, .stTextInput label {
+            color: #2d1f14 !important;
+        }
+        
         /* Title styling */
         .main-title {
-            color: #5c3d2e;
+            color: #3d2b1f !important;
             font-size: 42px;
             font-weight: bold;
             text-align: center;
@@ -44,7 +49,7 @@ st.markdown("""
         
         /* Subtitle styling */
         .sub-title {
-            color: #6b4c3b;
+            color: #5c3d2e !important;
             font-size: 18px;
             text-align: center;
             margin-bottom: 20px;
@@ -55,7 +60,7 @@ st.markdown("""
             background-color: #d4c5b2;
             padding: 12px 20px;
             border-radius: 8px;
-            color: #3d2b1f;
+            color: #2d1f14 !important;
             font-weight: bold;
             font-size: 20px;
             border-left: 6px solid #8b6b4c;
@@ -64,7 +69,7 @@ st.markdown("""
         
         /* Prediction box */
         .prediction-box {
-            background: linear-gradient(145deg, #e8ddd0, #d4c5b2);
+            background: linear-gradient(145deg, #d4c5b2, #c4b5a2);
             border: 3px solid #8b6b4c;
             border-radius: 15px;
             padding: 30px;
@@ -74,13 +79,13 @@ st.markdown("""
         }
         
         .prediction-value {
-            color: #3d2b1f;
+            color: #2d1f14 !important;
             font-size: 48px;
             font-weight: bold;
         }
         
         .prediction-label {
-            color: #5c3d2e;
+            color: #3d2b1f !important;
             font-size: 20px;
             font-weight: 600;
         }
@@ -88,7 +93,7 @@ st.markdown("""
         /* Button styling */
         .stButton > button {
             background-color: #8b6b4c;
-            color: white;
+            color: white !important;
             font-weight: bold;
             font-size: 18px;
             border-radius: 10px;
@@ -107,14 +112,26 @@ st.markdown("""
             background-color: #faf7f2;
             border: 2px solid #c4b5a2;
             border-radius: 6px;
+            color: #2d1f14 !important;
+        }
+        
+        .stNumberInput label {
+            color: #2d1f14 !important;
+            font-weight: 500;
         }
         
         /* Expander header */
         .streamlit-expanderHeader {
             background-color: #d4c5b2;
             border-radius: 8px;
-            color: #3d2b1f;
+            color: #2d1f14 !important;
             font-weight: 600;
+        }
+        
+        /* Expander content */
+        .streamlit-expanderContent {
+            background-color: #faf7f2;
+            border-radius: 0 0 8px 8px;
         }
         
         /* Metric box */
@@ -125,39 +142,28 @@ st.markdown("""
             border: 2px solid #8b6b4c;
         }
         
-        /* Image container styling */
-        .image-container {
-            display: flex;
-            justify-content: center;
-            margin: 10px 0 20px 0;
+        /* Dataframe text */
+        .dataframe {
+            color: #2d1f14 !important;
         }
         
-        .image-container img {
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            max-width: 100%;
-            height: auto;
+        /* Warning and info boxes */
+        .stAlert {
+            color: #2d1f14 !important;
+        }
+        
+        /* Caption text */
+        .stCaption {
+            color: #4d3a2a !important;
         }
     </style>
 """, unsafe_allow_html=True)
 
-# ========== Header with Image from GitHub ==========
-
-# Display image from GitHub repository
-# URL format: https://raw.githubusercontent.com/USERNAME/REPOSITORY/BRANCH/FILENAME
-st.markdown("""
-    <div class="image-container">
-        <img src="https://raw.githubusercontent.com/Baldr1919/UCS/main/soil.jpeg" 
-             alt="Soil Profile" 
-             width="800">
-    </div>
-""", unsafe_allow_html=True)
-
-# ========== Title ==========
+# ========== Title Section ==========
 st.markdown('<div class="main-title">🏗️ UCS Prediction App</div>', unsafe_allow_html=True)
 st.markdown('<div class="sub-title">Geotechnical Engineering - Unconfined Compressive Strength Prediction</div>', unsafe_allow_html=True)
 
-# ========== Info Section ==========
+# ========== About Section ==========
 with st.expander("ℹ️ About This App"):
     st.markdown("""
     This application uses a **Random Forest** machine learning model to predict the 
@@ -177,13 +183,13 @@ with st.expander("ℹ️ About This App"):
 st.markdown('<div class="section-header">📊 Enter 20 Soil Parameters</div>', unsafe_allow_html=True)
 
 if feature_names:
-    # Split into two columns
+    # Split input fields into two columns for better layout
     col1, col2 = st.columns(2)
     
     input_values = []
     mid_point = len(feature_names) // 2
     
-    # Create input fields dynamically
+    # Dynamically create input fields for all features
     for i, feature in enumerate(feature_names):
         if i < mid_point:
             with col1:
@@ -206,27 +212,27 @@ if feature_names:
                 )
                 input_values.append(value)
     
-    # Prediction button
+    # ========== Prediction Button ==========
     st.markdown("---")
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         predict_button = st.button("🔮 Predict UCS", type="primary", use_container_width=True)
     
-    # ========== Prediction ==========
+    # ========== Prediction Logic ==========
     if predict_button:
         if model is not None:
             try:
-                # Create DataFrame from inputs
+                # Convert inputs to DataFrame
                 input_df = pd.DataFrame([input_values], columns=feature_names)
                 
                 # Make prediction
                 prediction = model.predict(input_df)[0]
                 
-                # ========== Display Result ==========
+                # ========== Display Results ==========
                 st.markdown("---")
                 st.markdown('<div class="section-header">✅ Prediction Result</div>', unsafe_allow_html=True)
                 
-                # Prediction Box
+                # Prediction Box with styled output
                 st.markdown(f"""
                     <div class="prediction-box">
                         <div class="prediction-label">Unconfined Compressive Strength (UCS)</div>
@@ -234,15 +240,15 @@ if feature_names:
                     </div>
                 """, unsafe_allow_html=True)
                 
-                # Progress bar visualization
+                # Visual progress bar for UCS value
                 st.progress(min(prediction / 1000, 1.0))
                 st.caption(f"📊 UCS Value: {prediction:.2f} kPa")
                 
-                # Show input data
+                # ========== Show input data ==========
                 with st.expander("📋 View Input Data"):
                     st.dataframe(input_df, use_container_width=True)
                     
-                    # Download input data
+                    # Download button for input data
                     csv = input_df.to_csv(index=False)
                     st.download_button(
                         label="📥 Download Input Data (CSV)",
@@ -250,16 +256,6 @@ if feature_names:
                         file_name="input_data.csv",
                         mime="text/csv"
                     )
-                
-                # Feature importance
-                with st.expander("🌟 Feature Importance"):
-                    if hasattr(model, 'feature_importances_'):
-                        importance_df = pd.DataFrame({
-                            'Feature': feature_names,
-                            'Importance': model.feature_importances_
-                        }).sort_values('Importance', ascending=False)
-                        
-                        st.bar_chart(importance_df.set_index('Feature'))
                 
             except Exception as e:
                 st.error(f"❌ Prediction Error: {str(e)}")
@@ -272,7 +268,7 @@ else:
 # ========== Footer ==========
 st.markdown("---")
 st.markdown("""
-    <div style="text-align: center; color: #6b4c3b; padding: 10px; font-size: 14px;">
+    <div style="text-align: center; color: #4d3a2a; padding: 10px; font-size: 14px;">
         📌 Developed for Geotechnical Engineering Research | Random Forest Model
     </div>
 """, unsafe_allow_html=True)
