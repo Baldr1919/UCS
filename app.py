@@ -166,7 +166,7 @@ st.markdown('<div class="sub-title">Geotechnical Engineering - Unconfined Compre
 # ========== About Section ==========
 with st.expander("ℹ️ About This App"):
     st.markdown("""
-    This application uses a **Random Forest** machine learning model to predict the 
+    This application uses a **Gradient Boosting** machine learning model to predict the 
     **Unconfined Compressive Strength (UCS)** of soil based on 20 input parameters.
     
     **Model Performance:**
@@ -269,6 +269,6 @@ else:
 st.markdown("---")
 st.markdown("""
     <div style="text-align: center; color: #4d3a2a; padding: 10px; font-size: 14px;">
-        📌 Developed for Geotechnical Engineering Research | Random Forest Model
+        📌 Developed for Geotechnical Engineering Research | Gradient Boosting Model
     </div>
 """, unsafe_allow_html=True)
